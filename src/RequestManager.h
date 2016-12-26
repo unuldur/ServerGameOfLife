@@ -8,8 +8,8 @@
 #include <iostream>
 #include <map>
 #include <winsock.h>
-#include "../GameOfLifeMode/src/Mode.h"
-#include "../GameOfLifeMode/src/Player.h"
+#include "../GamingModeGameOfLife/src/Mode.h"
+#include "../GamingModeGameOfLife/src/Player.h"
 
 using namespace std;
 class RequestManager {
@@ -32,6 +32,7 @@ private:
     void getGames(vector<Mode*> * modes,SOCKET socket);
     void addPlayer(vector<Player *> * players,SOCKET socket);
     void getPlayersGame(vector<Mode*> * modes,SOCKET socket);
+    void getZone(vector<Mode *> *modes, SOCKET socket);
 
 };
 

@@ -3,7 +3,7 @@
 //
 
 #include "RequestManager.h"
-#include "../GameOfLifeMode/src/FactoryMode.h"
+#include "../GamingModeGameOfLife/src/FactoryMode.h"
 #include <string>
 #include <algorithm>
 #include <unistd.h>
@@ -102,6 +102,10 @@ void RequestManager::execute(vector<Mode*> * modes,vector<Player*> * players , S
     {
         return getPlayersGame(modes,socket);
     }
+    if(type == "GETZONE"){
+        return getZone(modes,socket);
+    }
+
 }
 
 void RequestManager::init(vector<Mode*> * modes,vector<Player*> * players, SOCKET socket) {
@@ -176,6 +180,7 @@ void RequestManager::add(vector<Mode*> * modes,vector<Player*> * players, SOCKET
 
     send(socket,buffer.str().c_str(),buffer.str().length(),0);
     if(status == 1){
+        (*itGame)->initializeZone();
         bufferOtherPlayer << "NEWPLAYER complete=true ";
     }
     else{
@@ -289,5 +294,21 @@ void RequestManager::getPlayersGame(vector<Mode *> *modes, SOCKET socket) {
     for(auto it = playerInGame.begin(); it != playerInGame.end() ; ++it){
         buffer << (*it)->getInfo() <<" ";
     }
+    send(socket,buffer.str().c_str(),buffer.str().length(),0);
+}
+
+void RequestManager::getZone(vector<Mode *> *modes, SOCKET socket) {
+    int idGame = atoi((arguments["idG"]).c_str());
+    stringstream buffer;
+    auto itGame = find_if(modes->begin(),modes->end(),[&idGame](const Mode* mode) {
+        return mode->getId() == idGame;});
+    if(itGame == modes->end())
+    {
+        buffer << "ERROR";
+        send(socket,buffer.str().c_str(),buffer.str().length(),0);
+        return;
+    }
+    buffer << "GETZONE ";
+    buffer << (*itGame)->getZone();
     send(socket,buffer.str().c_str(),buffer.str().length(),0);
 }

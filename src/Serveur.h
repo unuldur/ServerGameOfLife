@@ -8,8 +8,8 @@
 #include <iostream>
 #include <winsock2.h>
 #include <map>
-#include "../GameOfLifeMode/src/Mode.h"
-#include "../GameOfLifeMode/src/Player.h"
+#include "../GamingModeGameOfLife/src/Mode.h"
+#include "../GamingModeGameOfLife/src/Player.h"
 
 class Serveur{
     struct thread_param{

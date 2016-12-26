@@ -29,4 +29,5 @@
 *.app
 
 .idea
-cmake-build-debug
+Debug/
+cmake-build-debug/
