@@ -7,6 +7,9 @@
 
 #include <iostream>
 #include <winsock2.h>
+#include <map>
+#include "../GameOfLifeMode/src/Mode.h"
+#include "../GameOfLifeMode/src/Player.h"
 
 class Serveur{
     struct thread_param{
@@ -20,7 +23,8 @@ private:
     bool          running;
     SOCKADDR_IN   ServerAddr;
     DWORD         ClientThread(SOCKET);
-
+    vector<Player*> players;
+    vector<Mode*> games;
 public:
     Serveur(int);
     int           init();

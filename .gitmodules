@@ -1,0 +1,3 @@
+[submodule "GamingModeGameOfLife"]
+	path = GamingModeGameOfLife
+	url = https://github.com/unuldur/GamingModeGameOfLife.git

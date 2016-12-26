@@ -4,7 +4,9 @@
 
 
 
+#include <algorithm>
 #include "Serveur.h"
+#include "RequestManager.h"
 
 #define _MAX_HOST_LENGTH_ 100
 
@@ -42,7 +44,6 @@ int Serveur::init(){
     ServerAddr.sin_family = AF_INET;
     ServerAddr.sin_port = htons( port );
     ServerAddr.sin_addr.s_addr = inet_addr( inet_ntoa( MyAddress ) );
-
     cout <<"server correctement initialisé" << endl;
     return 0;
 }
@@ -75,7 +76,7 @@ int Serveur::start (){
         return 1;
     }
 
-    cout << "serveur démarré : à l'écoute du port " << port << endl;
+    cout << "serveur demarre : à l'ecoute du port " << port << endl;
     running = true;
     ClientAddrLen = sizeof( ClientAddr );
 
@@ -116,8 +117,45 @@ int Serveur::pause (){
 
 DWORD Serveur::ClientThread(SOCKET soc){
     cout << "thread client démarré" << endl;
+    char buffer[1024];
+    RequestManager* request;
+    while (recv(soc, buffer, sizeof(buffer), 0) > 0){
+        request = new RequestManager(buffer);
+        cout << "recupertaion de " << buffer <<endl;
+        request->manageRequest();
+        request->execute(&games,&players, soc);
+    };
+    auto it = find_if(players.begin(),players.end(),[&soc](const Player* play) {return play->getSocket() == soc;});
+    if(it != players.end())
+    {
+        for (auto itgames = games.begin(); itgames != games.end(); ++itgames) {
+            int ret = (*itgames)->deleteJoueur((*it)->getId());
+            if(ret != -1)
+            {
+                auto joueurs = (*itgames)->getJoueurs();
+                stringstream msg;
+                if(ret == 0){
+                    msg << "ERRORGAME";
+                    for (int i = 0; i < joueurs.size(); ++i) {
+                        send(joueurs[i]->getSocket(),msg.str().c_str(),msg.str().size(),0);
+                    }
+                    games.erase(itgames);
+                    break;
+                }
+                if(ret == 1)
+                {
+                    msg << "DELPLAYER id=" << (*it)->getId();
+                    for (int i = 0; i < joueurs.size(); ++i) {
+                        send(joueurs[i]->getSocket(),msg.str().c_str(),msg.str().size(),0);
+                    }
+                    break;
+                }
+            }
 
-
-
+        }
+        players.erase(it);
+    }
+    delete request;
+    cout << "fin thread client" << endl;
     return 0;
 }
